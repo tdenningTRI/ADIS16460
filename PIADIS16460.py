@@ -5,7 +5,7 @@ import time
 
 
 class IMU:
-    def __init__(self, sampleRate, dataReadyPin = 22, debug = False, ):
+    def __init__(self, sampleRate, dataReadyPin = 22, debug = False):
         """
         Initializes the SPI interface. Put IMU.update() in a while loop to update the member variable values. Important member variables are as follows:
         startTime

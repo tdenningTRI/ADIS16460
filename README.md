@@ -7,5 +7,5 @@ call update() as frequently as possible to update member values at the rate spec
 
 During initialization, sets startTime member to time since the epoch in nanoseconds. 
 
-The dataready pin is pulled high when data is available as frequently as set in sampleRate. lastTime updates the time of the last sample similarly to startTime initialization. 
+The dataready pin can be any gpio pin. It is pulled high when data is available as frequently as set in sampleRate. lastTime updates the time of the last sample similarly to startTime initialization. 
 

@@ -3,7 +3,7 @@ Make sure SPI is enabled in Raspberry Pi Config. Must enable the pigpio daemon w
 
 Initialize by calling IMU(sampleRate, dataReadyPin, debug)
 
-call update() as frequently as possible to update member values: xGyro, yGyro, zGyro, xAccel, yAccel, zAccel, intTemp, lastTime.
+call update() as frequently as possible to update member values at the rate specified in sampleRate: xGyro, yGyro, zGyro, xAccel, yAccel, zAccel, intTemp, lastTime.
 
 During initialization, sets startTime member to time since the epoch in nanoseconds. 
 

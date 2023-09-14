@@ -5,7 +5,7 @@ import time
 
 
 class IMU:
-    def __init__(self, sampleRate, dataReadyPin = 22, debug = False):
+    def __init__(self, sampleRate, dataReadyPin = 25, taps = 4, debug = False):
         """
         Initializes the SPI interface. Put IMU.update() in a while loop to update the member variable values. Important member variables are as follows:
         startTime
@@ -30,14 +30,14 @@ class IMU:
         self.sampleRate = sampleRate
         self.startTime = self.get_time()
         self.lastTime = self.get_time()
-        self.imu_init(sampleRate)
+        self.imu_init(sampleRate, taps)
         self.set_accel_scale_factor()
         self.set_gyro_scale_factor()
         self.dr_init(dataReadyPin)
         self.read()
         
 
-    def imu_init(self, rate):
+    def imu_init(self, rate, taps):
         '''
         Creates the SPI connection. Called when class instantiated. opens SPI and writes the Dec rate(sample rate) to the register
         
@@ -48,15 +48,15 @@ class IMU:
         
         try:
             self.pi = pigpio.pi()
-            self.spi = self.pi.spi_open(0,50000,3)
-            self.set_sample_rate(rate)
+            self.spi = self.pi.spi_open(0,1000000,3)
+            self.set_dec_rate(rate)
             return True
         
         except Exception as e:
             print(e)
             return False
 
-    def set_sample_rate(self, rate):
+    def set_dec_rate(self, rate):
         """
         Called in the imu_init function. This function calculates the decimation factor based on the user's desired sample rate. The default sample rate on
         the ADIS16460 is 2048 samples per second. Sample rates greater than 2048 will default to 2048. 
@@ -75,6 +75,21 @@ class IMU:
         w = write.to_bytes(2, byteorder = 'big', signed = False)
         self.pi.spi_write(self.spi,w)
     
+    def filter_init(self, taps):
+        '''
+        Sets the number of taps for the Bartlett Window FIR filter. See data sheet for frequency response. Must be an integer from 0-7 inclusive Numbers outside that range return false
+        
+        Parameters:
+        taps -> 3 bit integer
+        
+        returns: False if invalid number passed'''
+
+        if taps < 0 or taps > 7:
+            return False
+        write = 0xB800 + taps
+        w = write.to_bytes(2, byteorder = 'big', signed = False)
+        self.pi.spi_write(self.spi,w)
+
     def dr_init(self, pin):
         '''
         initializes the data ready(dr) interrupt pin. The dr pin transitions to high when data is available on the output registers. sets self.ready to true in order for it to be checked by the update method
@@ -255,7 +270,7 @@ class IMU:
 
 
 if __name__ == "__main__":
-    o = IMU(sampleRate=30, debug = True)
+    o = IMU(sampleRate=30, taps = 4, debug = True)
     ns = 0
     
     while(ns/1000000000 < 5):

@@ -214,7 +214,7 @@ class IMU:
         Returns:
         int: system time
         """
-        return time.time_ns()
+        return time.monotonic_ns()
     
     
 

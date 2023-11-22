@@ -34,6 +34,7 @@ class IMU:
         self.set_accel_scale_factor()
         self.set_gyro_scale_factor()
         self.dr_init(dataReadyPin)
+        self.filter_init(taps)
         self.read()
         
 
@@ -218,31 +219,6 @@ class IMU:
     
     
 
-    def diag_lookup(self, diag):
-        """
-        Lookup table for Diga_stat. Possibly useful for debugging
-        
-        Parameters: 8 bit number
-        Returns: True if no errors otherwise False
-        """
-        diag = int(diag)
-        if diag < 3:
-            return True
-        b = bin(diag)
-        print(b)
-        if b[7] == '1':
-            print("ERROR: Input clock out of sync!")
-        if b[6] == '1':
-            print("ERROR: Flash Memory Test Failed")
-        if b[5] == '1':
-            print("ERROR: Self test diagnostic error!")
-        if b[4] == '1':
-            print("ERROR: Sensor Overrange!")
-        if b[3] == '1':
-            print("ERROR: SPI communication Failure!")
-        if b[2] == '1':
-            print("ERROR: Flash Update Failure!")       
-        return False
 
     def set_accel_scale_factor(self):
 
@@ -255,7 +231,7 @@ class IMU:
         """
         g = 9.80665
         # g=1
-        self.accelScaleFactor = 0.25/(2**(16))*g
+        self.accelScaleFactor = 0.25/(2**(16))*g/1000
 
     def set_gyro_scale_factor(self):
         """
